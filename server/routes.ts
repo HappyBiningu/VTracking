@@ -9,11 +9,44 @@ import {
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Simple authentication - create a default user for demo purposes
+  let authenticatedUser: any = null;
+
+  // Login endpoint
+  app.get("/api/login", async (req, res) => {
+    try {
+      // For demo purposes, create or get a default fleet manager user
+      let user = await storage.getUserByUsername("fleetmanager");
+      
+      if (!user) {
+        // Create a default user for the demo
+        user = await storage.createUser({
+          username: "fleetmanager",
+          password: "demo123" // In production, this would be properly hashed
+        });
+      }
+      
+      // Set the authenticated user
+      authenticatedUser = user;
+      
+      // Redirect to dashboard
+      res.redirect("/dashboard");
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // Logout endpoint
+  app.post("/api/logout", async (req, res) => {
+    authenticatedUser = null;
+    res.json({ success: true });
+  });
+
   // Authentication routes
   app.get("/api/auth/user", async (req, res) => {
-    // For now, return null to indicate no authenticated user
-    // In a real app, this would check session/token
-    res.json(null);
+    // Return the authenticated user or null
+    res.json(authenticatedUser);
   });
 
   // Vehicle routes

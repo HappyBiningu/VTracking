@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import type { Vehicle, Trip } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FleetStats from "@/components/FleetStats";
 import VehicleCard from "@/components/VehicleCard";
@@ -38,12 +39,12 @@ export default function Dashboard() {
   });
 
   // Fetch vehicles
-  const { data: vehicles = [], isLoading: vehiclesLoading, error: vehiclesError } = useQuery({
+  const { data: vehicles = [], isLoading: vehiclesLoading, error: vehiclesError } = useQuery<Vehicle[]>({
     queryKey: ["/api/vehicles"],
   });
 
   // Fetch active trips
-  const { data: trips = [], isLoading: tripsLoading, error: tripsError } = useQuery({
+  const { data: trips = [], isLoading: tripsLoading, error: tripsError } = useQuery<Trip[]>({
     queryKey: ["/api/trips"],
   });
 
@@ -63,12 +64,12 @@ export default function Dashboard() {
 
   // Transform vehicles for map display (only those with location data)
   const mapVehicles = vehicles
-    .filter((vehicle: any) => vehicle.lastLatitude && vehicle.lastLongitude)
-    .map((vehicle: any) => ({
+    .filter((vehicle) => vehicle.lastLatitude && vehicle.lastLongitude)
+    .map((vehicle) => ({
       id: vehicle.id,
       registrationNumber: vehicle.licensePlate,
-      lat: parseFloat(vehicle.lastLatitude),
-      lng: parseFloat(vehicle.lastLongitude),
+      lat: parseFloat(vehicle.lastLatitude!),
+      lng: parseFloat(vehicle.lastLongitude!),
       status: vehicle.status,
       heading: 0, // Default heading since we don't have this data
       speed: 0, // Default speed since we don't have this data
@@ -78,7 +79,7 @@ export default function Dashboard() {
   const recentVehicles = vehicles.slice(0, 2);
 
   // Get active trips only
-  const activeTrips = trips.filter((trip: any) => trip.status === "in_progress");
+  const activeTrips = trips.filter((trip) => trip.status === "in_progress");
 
   // For now we'll hide email notifications until we implement the endpoint
   const emailNotifications: any[] = [];
