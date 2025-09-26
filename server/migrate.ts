@@ -120,7 +120,7 @@ async function migrate() {
 }
 
 // Run migration if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   migrate()
     .then(() => {
       console.log("Migration completed successfully!");
