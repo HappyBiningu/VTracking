@@ -182,8 +182,8 @@ export default function TripCard({
             className="flex-1"
             onClick={() => {
               console.log(`View trip details for ${id}`);
+              setLocation(`/trips/active-trips`);
               onViewTrip?.();
-              setLocation(`/trips/${id}`);
             }}
             data-testid={`button-view-trip-${id}`}
           >

@@ -116,6 +116,7 @@ export default function VehicleCard({
             className="flex-1"
             onClick={() => {
               console.log(`View details for vehicle ${registrationNumber}`);
+              setLocation(`/fleet/vehicle-details`);
               onViewDetails?.();
             }}
             data-testid={`button-view-details-${id}`}

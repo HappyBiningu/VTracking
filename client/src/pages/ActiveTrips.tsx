@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ export default function ActiveTrips() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState("startTime");
+  const [location, setLocation] = useLocation();
 
   // Fetch trips
   const { data: trips = [], isLoading, error } = useQuery<Trip[]>({
@@ -75,7 +77,7 @@ export default function ActiveTrips() {
             Monitor and manage all ongoing and planned trips
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setLocation("/trips/trip-planning")}>
           <Plus className="h-4 w-4 mr-2" />
           Plan New Trip
         </Button>

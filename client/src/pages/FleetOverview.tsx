@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ export default function FleetOverview() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState("licensePlate");
+  const [location, setLocation] = useLocation();
 
   // Fetch vehicles
   const { data: vehicles = [], isLoading, error } = useQuery<Vehicle[]>({
@@ -78,7 +80,7 @@ export default function FleetOverview() {
             Comprehensive view of all vehicles in your fleet
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setLocation("/fleet/vehicle-details")}>
           <Plus className="h-4 w-4 mr-2" />
           Add Vehicle
         </Button>

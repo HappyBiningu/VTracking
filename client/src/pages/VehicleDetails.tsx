@@ -306,7 +306,7 @@ export default function VehicleDetails() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => console.log(`View details for ${vehicle.licensePlate}`)}
+                      onClick={() => editVehicle(vehicle)}
                     >
                       <FileText className="h-4 w-4 mr-2" />
                       Details
