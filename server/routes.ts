@@ -156,7 +156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/vehicles/:id", async (req, res) => {
+  app.get("/api/vehicles/:id", requireAuth, async (req, res) => {
     try {
       const vehicle = await storage.getVehicle(req.params.id);
       if (!vehicle) {
@@ -169,7 +169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/vehicles", async (req, res) => {
+  app.post("/api/vehicles", requireAuth, async (req, res) => {
     try {
       const vehicleData = insertVehicleSchema.parse(req.body);
       const vehicle = await storage.createVehicle(vehicleData);
@@ -179,7 +179,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/vehicles/:id", async (req, res) => {
+  app.put("/api/vehicles/:id", requireAuth, async (req, res) => {
     try {
       const updates = insertVehicleSchema.partial().parse(req.body);
       const vehicle = await storage.updateVehicle(req.params.id, updates);
@@ -203,7 +203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/drivers", async (req, res) => {
+  app.post("/api/drivers", requireAuth, async (req, res) => {
     try {
       const driverData = insertDriverSchema.parse(req.body);
       const driver = await storage.createDriver(driverData);
@@ -227,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/trips", async (req, res) => {
+  app.post("/api/trips", requireAuth, async (req, res) => {
     try {
       const tripData = insertTripSchema.parse(req.body);
       const trip = await storage.createTrip(tripData);
@@ -237,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/trips/:id", async (req, res) => {
+  app.put("/api/trips/:id", requireAuth, async (req, res) => {
     try {
       const updates = insertTripSchema.partial().parse(req.body);
       const trip = await storage.updateTrip(req.params.id, updates);
@@ -252,7 +252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Maintenance routes
-  app.get("/api/maintenance", async (req, res) => {
+  app.get("/api/maintenance", requireAuth, async (req, res) => {
     try {
       const { vehicleId } = req.query;
       const records = await storage.getMaintenanceRecords(vehicleId as string);
@@ -262,7 +262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/maintenance", async (req, res) => {
+  app.post("/api/maintenance", requireAuth, async (req, res) => {
     try {
       const recordData = insertMaintenanceRecordSchema.parse(req.body);
       const record = await storage.createMaintenanceRecord(recordData);

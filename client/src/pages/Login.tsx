@@ -145,7 +145,7 @@ export default function Login() {
 
             <div className="mt-6 text-center space-y-4">
               <div className="text-sm text-muted-foreground">
-                Demo credentials: Any username and password
+                Demo credentials: <strong>fleetmanager</strong> / <strong>demo123</strong>
               </div>
               
               <div className="relative">
