@@ -28,6 +28,7 @@ import {
   Star,
   Truck
 } from "lucide-react";
+import DocumentUpload from "@/components/DocumentUpload";
 
 interface Driver {
   id: string;
@@ -63,6 +64,8 @@ export default function DriverManagement() {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDocUploadOpen, setIsDocUploadOpen] = useState(false);
+  const [uploadDriverId, setUploadDriverId] = useState<string>("");
 
   // Mock drivers data
   const mockDrivers: Driver[] = [
@@ -220,6 +223,16 @@ export default function DriverManagement() {
 
   const suspendDriver = (driverId: string) => {
     console.log(`Suspend driver: ${driverId}`);
+  };
+
+  const handleDocumentUpload = (driverId: string) => {
+    setUploadDriverId(driverId);
+    setIsDocUploadOpen(true);
+  };
+
+  const onDocumentUploaded = (documentData: any) => {
+    console.log("Document uploaded for driver:", uploadDriverId, documentData);
+    // In a real app, this would update the driver's documents
   };
 
   return (
@@ -477,6 +490,14 @@ export default function DriverManagement() {
                       <Edit className="h-4 w-4 mr-2" />
                       Edit
                     </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDocumentUpload(driver.id)}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Documents
+                    </Button>
                     {driver.status === "active" && (
                       <Button
                         size="sm"
@@ -699,6 +720,14 @@ export default function DriverManagement() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Document Upload Dialog */}
+      <DocumentUpload
+        isOpen={isDocUploadOpen}
+        onClose={() => setIsDocUploadOpen(false)}
+        onUpload={onDocumentUploaded}
+        driverId={uploadDriverId}
+      />
     </div>
   );
 }

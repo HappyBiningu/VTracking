@@ -25,9 +25,11 @@ import {
   CheckCircle2,
   Settings,
   FileText,
-  Wrench
+  Wrench,
+  Upload
 } from "lucide-react";
 import type { Vehicle } from "@shared/schema";
+import DocumentUpload from "@/components/DocumentUpload";
 
 interface VehicleDetail extends Vehicle {
   mileage: number;
@@ -56,6 +58,8 @@ export default function VehicleDetails() {
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleDetail | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDocUploadOpen, setIsDocUploadOpen] = useState(false);
+  const [uploadVehicleId, setUploadVehicleId] = useState<string>("");
 
   // Fetch vehicles
   const { data: vehicles = [], isLoading } = useQuery<Vehicle[]>({
@@ -113,6 +117,16 @@ export default function VehicleDetails() {
 
   const deleteVehicle = (vehicleId: string) => {
     console.log(`Delete vehicle: ${vehicleId}`);
+  };
+
+  const handleDocumentUpload = (vehicleId: string) => {
+    setUploadVehicleId(vehicleId);
+    setIsDocUploadOpen(true);
+  };
+
+  const onVehicleDocumentUploaded = (documentData: any) => {
+    console.log("Document uploaded for vehicle:", uploadVehicleId, documentData);
+    // In a real app, this would update the vehicle's documents
   };
 
   if (isLoading) {
@@ -280,6 +294,14 @@ export default function VehicleDetails() {
                     >
                       <Edit className="h-4 w-4 mr-2" />
                       Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDocumentUpload(vehicle.id)}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Documents
                     </Button>
                     <Button
                       size="sm"
@@ -461,6 +483,14 @@ export default function VehicleDetails() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Vehicle Document Upload Dialog */}
+      <DocumentUpload
+        isOpen={isDocUploadOpen}
+        onClose={() => setIsDocUploadOpen(false)}
+        onUpload={onVehicleDocumentUploaded}
+        vehicleId={uploadVehicleId}
+      />
     </div>
   );
 }

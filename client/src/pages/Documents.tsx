@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   Folder
 } from "lucide-react";
+import DocumentUpload from "@/components/DocumentUpload";
 
 interface Document {
   id: string;
@@ -26,17 +27,21 @@ interface Document {
   type: string;
   category: string;
   vehicleId?: string;
+  driverId?: string;
   size: string;
   uploadDate: Date;
   expiryDate?: Date;
   status: "active" | "expired" | "expiring_soon";
   description: string;
+  fileUrl?: string;
 }
 
 export default function Documents() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [documents, setDocuments] = useState<Document[]>([]);
 
   // Mock documents data
   const mockDocuments: Document[] = [
@@ -44,13 +49,13 @@ export default function Documents() {
       id: "doc-001",
       name: "Vehicle Registration - ABC123",
       type: "pdf",
-      category: "registration",
+      category: "vehicle_licence",
       vehicleId: "veh-001",
       size: "2.4 MB",
       uploadDate: new Date("2024-01-15"),
       expiryDate: new Date("2025-01-15"),
       status: "active",
-      description: "Registration certificate for ABC123"
+      description: "Vehicle licence certificate for ABC123"
     },
     {
       id: "doc-002",
@@ -62,45 +67,95 @@ export default function Documents() {
       uploadDate: new Date("2024-02-01"),
       expiryDate: new Date("2024-12-31"),
       status: "expiring_soon",
-      description: "Comprehensive insurance policy"
+      description: "Third party insurance policy"
     },
     {
       id: "doc-003",
       name: "Driver License - John Doe",
       type: "pdf",
-      category: "license",
+      category: "driver_licence",
+      driverId: "drv-001",
       size: "0.5 MB",
       uploadDate: new Date("2024-01-10"),
       expiryDate: new Date("2024-11-15"),
       status: "expiring_soon",
-      description: "Commercial driver's license"
+      description: "Commercial driver's licence"
     },
     {
       id: "doc-004",
-      name: "Maintenance Certificate - DEF456",
+      name: "Vehicle Fitness Certificate - DEF456",
       type: "pdf",
-      category: "maintenance",
+      category: "vehicle_fitness",
       vehicleId: "veh-003",
       size: "3.2 MB",
       uploadDate: new Date("2024-03-01"),
       expiryDate: new Date("2024-09-01"),
       status: "expired",
-      description: "Annual maintenance inspection certificate"
+      description: "Annual vehicle fitness inspection certificate"
     },
     {
       id: "doc-005",
-      name: "Fuel Receipt - March 2024",
+      name: "Medical Certificate - John Doe",
       type: "pdf",
-      category: "receipts",
+      category: "medical_certificate",
+      driverId: "drv-001",
       size: "0.8 MB",
       uploadDate: new Date("2024-03-15"),
+      expiryDate: new Date("2025-03-15"),
       status: "active",
-      description: "Monthly fuel expense receipts"
+      description: "Driver medical fitness certificate"
     },
+    {
+      id: "doc-006",
+      name: "Border Clearance - Beitbridge",
+      type: "pdf",
+      category: "border_clearance",
+      vehicleId: "veh-001",
+      size: "1.2 MB",
+      uploadDate: new Date("2024-03-20"),
+      expiryDate: new Date("2024-04-20"),
+      status: "active",
+      description: "Border clearance documentation for Beitbridge crossing"
+    },
+    {
+      id: "doc-007",
+      name: "Goods Declaration Form",
+      type: "pdf",
+      category: "border_clearance",
+      size: "0.6 MB",
+      uploadDate: new Date("2024-03-18"),
+      status: "active",
+      description: "Customs goods declaration form"
+    },
+    {
+      id: "doc-008",
+      name: "Transit Permit - Regional",
+      type: "pdf",
+      category: "border_clearance",
+      vehicleId: "veh-002",
+      size: "0.9 MB",
+      uploadDate: new Date("2024-03-22"),
+      expiryDate: new Date("2024-04-22"),
+      status: "active",
+      description: "Regional transit permit for cross-border operations"
+    }
   ];
 
+  // Initialize documents state
+  useState(() => {
+    setDocuments(mockDocuments);
+  });
+
+  const handleDocumentUpload = (documentData: any) => {
+    const newDocument: Document = {
+      id: `doc-${Date.now()}`,
+      ...documentData,
+    };
+    setDocuments(prev => [newDocument, ...prev]);
+  };
+
   // Filter documents
-  const filteredDocuments = mockDocuments.filter((doc) => {
+  const filteredDocuments = documents.filter((doc) => {
     const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doc.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "all" || doc.category === categoryFilter;
@@ -110,9 +165,9 @@ export default function Documents() {
 
   // Group documents by status
   const documentsByStatus = {
-    active: mockDocuments.filter(d => d.status === "active"),
-    expiring_soon: mockDocuments.filter(d => d.status === "expiring_soon"),
-    expired: mockDocuments.filter(d => d.status === "expired"),
+    active: documents.filter(d => d.status === "active"),
+    expiring_soon: documents.filter(d => d.status === "expiring_soon"),
+    expired: documents.filter(d => d.status === "expired"),
   };
 
   const getStatusIcon = (status: string) => {
@@ -155,7 +210,7 @@ export default function Documents() {
             Manage vehicle registrations, insurance, licenses, and other important documents
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setIsUploadDialogOpen(true)}>
           <Upload className="h-4 w-4 mr-2" />
           Upload Document
         </Button>
@@ -169,7 +224,7 @@ export default function Documents() {
             <Folder className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockDocuments.length}</div>
+            <div className="text-2xl font-bold">{documents.length}</div>
             <p className="text-xs text-muted-foreground">All documents</p>
           </CardContent>
         </Card>
@@ -227,10 +282,12 @@ export default function Documents() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="registration">Registration</SelectItem>
+            <SelectItem value="vehicle_licence">Vehicle Licence</SelectItem>
             <SelectItem value="insurance">Insurance</SelectItem>
-            <SelectItem value="license">Licenses</SelectItem>
-            <SelectItem value="maintenance">Maintenance</SelectItem>
+            <SelectItem value="vehicle_fitness">Vehicle Fitness</SelectItem>
+            <SelectItem value="driver_licence">Driver Licence</SelectItem>
+            <SelectItem value="medical_certificate">Medical Certificate</SelectItem>
+            <SelectItem value="border_clearance">Border Clearance</SelectItem>
             <SelectItem value="receipts">Receipts</SelectItem>
           </SelectContent>
         </Select>
@@ -251,7 +308,7 @@ export default function Documents() {
       {/* Main Content */}
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="all">All Documents ({mockDocuments.length})</TabsTrigger>
+          <TabsTrigger value="all">All Documents ({documents.length})</TabsTrigger>
           <TabsTrigger value="expiring">Expiring ({documentsByStatus.expiring_soon.length})</TabsTrigger>
           <TabsTrigger value="expired">Expired ({documentsByStatus.expired.length})</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
@@ -367,8 +424,8 @@ export default function Documents() {
 
         <TabsContent value="categories" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {["registration", "insurance", "license", "maintenance", "receipts"].map((category) => {
-              const categoryDocs = mockDocuments.filter(d => d.category === category);
+            {["vehicle_licence", "insurance", "vehicle_fitness", "driver_licence", "medical_certificate", "border_clearance", "receipts"].map((category) => {
+              const categoryDocs = documents.filter(d => d.category === category);
               return (
                 <Card key={category}>
                   <CardHeader>
@@ -402,6 +459,13 @@ export default function Documents() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Document Upload Dialog */}
+      <DocumentUpload
+        isOpen={isUploadDialogOpen}
+        onClose={() => setIsUploadDialogOpen(false)}
+        onUpload={handleDocumentUpload}
+      />
     </div>
   );
 }
