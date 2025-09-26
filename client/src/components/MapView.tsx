@@ -1,6 +1,18 @@
+
+import { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Navigation, Truck } from "lucide-react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Fix for default markers in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface Vehicle {
   id: string;
@@ -17,18 +29,124 @@ interface MapViewProps {
 }
 
 const statusColors = {
-  active: "bg-green-500",
-  maintenance: "bg-orange-500",
-  offline: "bg-red-500"
+  active: "#22c55e",
+  maintenance: "#f97316", 
+  offline: "#ef4444"
 } as const;
 
 const statusLabels = {
   active: "Active",
-  maintenance: "Maintenance",
+  maintenance: "Maintenance", 
   offline: "Offline"
 } as const;
 
 export default function MapView({ vehicles }: MapViewProps) {
+  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.LayerGroup | null>(null);
+
+  useEffect(() => {
+    // Initialize map if not already created
+    if (!mapRef.current) {
+      const map = L.map('fleet-map').setView([-18.0, 29.0], 6); // Centered on Zimbabwe
+      
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+      }).addTo(map);
+
+      mapRef.current = map;
+      markersRef.current = L.layerGroup().addTo(map);
+    }
+
+    // Clear existing markers
+    if (markersRef.current) {
+      markersRef.current.clearLayers();
+    }
+
+    // Add vehicle markers
+    vehicles.forEach((vehicle) => {
+      if (markersRef.current) {
+        // Create custom icon based on status
+        const iconHtml = `
+          <div style="
+            width: 24px; 
+            height: 24px; 
+            background-color: ${statusColors[vehicle.status]}; 
+            border: 2px solid white; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          ">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+              <path d="M3 6h2l.5 2h13l.5-2h2v3h-1l-1 8H5l-1-8H3V6zm5 2v8h8V8H8z"/>
+            </svg>
+          </div>
+        `;
+
+        const customIcon = L.divIcon({
+          html: iconHtml,
+          className: 'custom-vehicle-marker',
+          iconSize: [24, 24],
+          iconAnchor: [12, 12],
+        });
+
+        const marker = L.marker([vehicle.lat, vehicle.lng], { 
+          icon: customIcon 
+        });
+
+        // Add popup with vehicle information
+        const popupContent = `
+          <div style="font-family: system-ui; padding: 8px;">
+            <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">
+              ${vehicle.registrationNumber}
+            </h3>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <div style="
+                width: 8px; 
+                height: 8px; 
+                background-color: ${statusColors[vehicle.status]}; 
+                border-radius: 50%;
+              "></div>
+              <span style="font-size: 12px; color: #666;">
+                ${statusLabels[vehicle.status]}
+              </span>
+            </div>
+            <div style="font-size: 11px; color: #888;">
+              Lat: ${vehicle.lat.toFixed(4)}, Lng: ${vehicle.lng.toFixed(4)}
+            </div>
+            ${vehicle.speed > 0 ? `
+              <div style="font-size: 11px; color: #888;">
+                Speed: ${vehicle.speed} km/h
+              </div>
+            ` : ''}
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        markersRef.current.addLayer(marker);
+      }
+    });
+
+    // Fit map to show all vehicles
+    if (vehicles.length > 0 && mapRef.current) {
+      const bounds = L.latLngBounds(vehicles.map(v => [v.lat, v.lng]));
+      mapRef.current.fitBounds(bounds, { padding: [20, 20] });
+    }
+  }, [vehicles]);
+
+  useEffect(() => {
+    // Cleanup on unmount
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <Card data-testid="map-view">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
@@ -39,78 +157,15 @@ export default function MapView({ vehicles }: MapViewProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Mock Map Container */}
-        <div className="relative bg-muted/30 rounded-lg border-2 border-dashed border-muted-foreground/20 h-80 mb-4 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50 opacity-50" />
-
-          {/* Map Grid Lines */}
-          <div className="absolute inset-0 opacity-20">
-            {[...Array(8)].map((_, i) => (
-              <div key={`h-${i}`} className="absolute w-full border-t border-gray-300" style={{ top: `${i * 12.5}%` }} />
-            ))}
-            {[...Array(6)].map((_, i) => (
-              <div key={`v-${i}`} className="absolute h-full border-l border-gray-300" style={{ left: `${i * 16.67}%` }} />
-            ))}
-          </div>
-
-          {/* Mock Map Title */}
-          <div className="absolute top-4 left-4 bg-white/90 rounded-lg px-3 py-2 shadow-sm">
-            <div className="text-sm font-medium">Fleet Coverage Map</div>
-            <div className="text-xs text-muted-foreground">Real-time vehicle positions</div>
-          </div>
-
-          {/* Vehicle Markers */}
-          {vehicles.map((vehicle, index) => {
-            const x = Math.min(Math.max(10 + (index * 15) % 70, 10), 85);
-            const y = Math.min(Math.max(15 + (index * 12) % 60, 15), 75);
-
-            return (
-              <div
-                key={vehicle.id}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
-                style={{ left: `${x}%`, top: `${y}%` }}
-                data-testid={`vehicle-marker-${vehicle.id}`}
-              >
-                {/* Vehicle Marker */}
-                <div className="relative">
-                  <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center ${statusColors[vehicle.status]} hover:scale-110 transition-transform`}>
-                    <Truck className="w-3 h-3 text-white" />
-                  </div>
-
-                  {/* Direction Indicator */}
-                  {vehicle.speed > 0 && (
-                    <div
-                      className="absolute -top-2 -right-2 w-3 h-3 bg-blue-500 rounded-full opacity-75"
-                      style={{ transform: `rotate(${vehicle.heading}deg)` }}
-                    >
-                      <Navigation className="w-2 h-2 text-white ml-0.5" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Tooltip on Hover */}
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-3 min-w-48 opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
-                  <div className="text-sm font-medium">{vehicle.registrationNumber}</div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className={`w-2 h-2 rounded-full ${statusColors[vehicle.status]}`} />
-                    <span className="text-xs text-muted-foreground">{statusLabels[vehicle.status]}</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Lat: {vehicle.lat.toFixed(4)}, Lng: {vehicle.lng.toFixed(4)}
-                  </div>
-                  {vehicle.speed > 0 && (
-                    <div className="text-xs text-muted-foreground">
-                      Speed: {vehicle.speed} km/h
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Real Map Container */}
+        <div 
+          id="fleet-map" 
+          style={{ height: '400px', width: '100%' }}
+          className="rounded-lg border"
+        />
 
         {/* Vehicle Status Legend */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-green-500" />
@@ -127,10 +182,11 @@ export default function MapView({ vehicles }: MapViewProps) {
           </div>
 
           <Badge variant="secondary" className="text-xs">
-            Last updated: Just now
+            Powered by OpenStreetMap
           </Badge>
         </div>
       </CardContent>
     </Card>
   );
 }
+</Leaflet>
