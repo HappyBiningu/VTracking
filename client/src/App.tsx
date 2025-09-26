@@ -12,16 +12,20 @@ import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/not-found";
 
-function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  }
-
+function AuthenticatedRouter() {
   return (
     <Switch>
-      <Route path="/" component={isAuthenticated ? Dashboard : Landing} />
+      <Route path="/" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function UnauthenticatedRouter() {
+  return (
+    <Switch>
+      <Route path="/" component={Landing} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -51,7 +55,7 @@ function AppContent() {
               <ThemeToggle />
             </header>
             <main className="flex-1 overflow-auto">
-              <Router />
+              <AuthenticatedRouter />
             </main>
           </SidebarInset>
         </div>
@@ -59,7 +63,7 @@ function AppContent() {
     );
   }
 
-  return <Router />;
+  return <UnauthenticatedRouter />;
 }
 
 export default function App() {

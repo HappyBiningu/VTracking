@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import EmailNotificationCenter from "@/components/EmailNotificationCenter";
 import QuickActions from "@/components/QuickActions";
 import { Clock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { queryClient } from "@/lib/queryClient";
 
 export default function Dashboard() {
   const { toast } = useToast();
@@ -30,121 +32,63 @@ export default function Dashboard() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
-  // todo: remove mock functionality
-  const mockFleetStats = {
-    totalVehicles: 24,
-    activeVehicles: 18,
-    maintenanceVehicles: 4,
-    offlineVehicles: 2,
-    activeTrips: 12,
-    plannedTrips: 8,
-    completedTripsToday: 5,
-    avgFuelLevel: 68,
-    lowFuelAlerts: 3,
-    totalDistance: 45780
+  // Fetch fleet statistics
+  const { data: fleetStats, isLoading: statsLoading, error: statsError } = useQuery({
+    queryKey: ["/api/fleet/stats"],
+  });
+
+  // Fetch vehicles
+  const { data: vehicles = [], isLoading: vehiclesLoading, error: vehiclesError } = useQuery({
+    queryKey: ["/api/vehicles"],
+  });
+
+  // Fetch active trips
+  const { data: trips = [], isLoading: tripsLoading, error: tripsError } = useQuery({
+    queryKey: ["/api/trips"],
+  });
+
+  // Provide safe fallback for fleet stats
+  const safeFleetStats = fleetStats || {
+    totalVehicles: 0,
+    activeVehicles: 0,
+    maintenanceVehicles: 0,
+    offlineVehicles: 0,
+    activeTrips: 0,
+    plannedTrips: 0,
+    completedTripsToday: 0,
+    avgFuelLevel: 0,
+    lowFuelAlerts: 0,
+    totalDistance: 0
   };
 
-  const mockRecentVehicles = [
-    {
-      id: "1",
-      registrationNumber: "TRK-001-ZW",
-      make: "Mercedes-Benz",
-      model: "Actros",
-      year: 2020,
-      status: "active" as const,
-      currentLocation: "Harare, Zimbabwe",
-      fuelLevel: 75,
-      driverName: "John Mukamba",
-      lastUpdate: "5 minutes ago"
-    },
-    {
-      id: "2",
-      registrationNumber: "TRK-002-ZW",
-      make: "Volvo", 
-      model: "FH16",
-      year: 2019,
-      status: "maintenance" as const,
-      currentLocation: "Bulawayo Service Center",
-      fuelLevel: 30,
-      driverName: "Sarah Moyo",
-      lastUpdate: "2 hours ago"
-    }
-  ];
+  // Transform vehicles for map display (only those with location data)
+  const mapVehicles = vehicles
+    .filter((vehicle: any) => vehicle.lastLatitude && vehicle.lastLongitude)
+    .map((vehicle: any) => ({
+      id: vehicle.id,
+      registrationNumber: vehicle.licensePlate,
+      lat: parseFloat(vehicle.lastLatitude),
+      lng: parseFloat(vehicle.lastLongitude),
+      status: vehicle.status,
+      heading: 0, // Default heading since we don't have this data
+      speed: 0, // Default speed since we don't have this data
+    }));
 
-  const mockActiveTrips = [
-    {
-      id: "TRP001",
-      origin: "Harare, Zimbabwe",
-      destination: "Cape Town, South Africa",
-      vehicle: {
-        registrationNumber: "TRK-001-ZW",
-        driverName: "John Mukamba"
-      },
-      status: "in-progress" as const,
-      startDate: "Dec 15, 2024",
-      expectedArrival: "Dec 18, 2024",
-      progress: 65,
-      loadWeight: 25000,
-      distance: 1247,
-      fuelBudget: 450
-    }
-  ];
+  // Get recent vehicles (latest 2)
+  const recentVehicles = vehicles.slice(0, 2);
 
-  const mockMapVehicles = [
-    {
-      id: "1",
-      registrationNumber: "TRK-001-ZW",
-      lat: -17.8252,
-      lng: 31.0335,
-      status: "active" as const,
-      heading: 45,
-      speed: 65
-    },
-    {
-      id: "2",
-      registrationNumber: "TRK-002-ZW",
-      lat: -20.1547,
-      lng: 28.5833,
-      status: "maintenance" as const,
-      heading: 180,
-      speed: 0
-    },
-    {
-      id: "3",
-      registrationNumber: "TRK-003-ZW",
-      lat: -18.9756,
-      lng: 32.6850,
-      status: "active" as const,
-      heading: 270,
-      speed: 45
-    }
-  ];
+  // Get active trips only
+  const activeTrips = trips.filter((trip: any) => trip.status === "in_progress");
 
-  const mockEmailNotifications = [
-    {
-      id: "1",
-      type: "trip-update" as const,
-      subject: "Trip TRP001 - Progress Update",
-      recipient: "manager@logistics.com",
-      status: "sent" as const,
-      timestamp: "5 minutes ago",
-      vehicleId: "TRK-001-ZW",
-      priority: "medium" as const
-    },
-    {
-      id: "2",
-      type: "fuel-alert" as const,
-      subject: "Low Fuel Alert - TRK-003-ZW",
-      recipient: "dispatch@logistics.com",
-      status: "pending" as const,
-      timestamp: "10 minutes ago",
-      vehicleId: "TRK-003-ZW",
-      priority: "high" as const
-    }
-  ];
+  // For now we'll hide email notifications until we implement the endpoint
+  const emailNotifications: any[] = [];
 
   const handleRefreshDashboard = () => {
-    console.log('Dashboard refresh triggered');
+    // Invalidate all relevant queries to force refetch
+    queryClient.invalidateQueries({ queryKey: ["/api/fleet/stats"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/vehicles"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/trips"] });
+    
     toast({
       title: "Dashboard Updated",
       description: "Fleet data has been refreshed",
@@ -191,30 +135,75 @@ export default function Dashboard() {
       </div>
 
       {/* Fleet Statistics */}
-      <FleetStats stats={mockFleetStats} />
+      {statsLoading ? (
+        <div className="flex items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+        </div>
+      ) : statsError ? (
+        <Card>
+          <CardContent className="flex items-center justify-center p-8">
+            <p className="text-destructive">Failed to load fleet statistics</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <FleetStats stats={safeFleetStats} />
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Map and Quick Actions */}
         <div className="lg:col-span-2 space-y-6">
-          <MapView vehicles={mockMapVehicles} />
+          {vehiclesLoading ? (
+            <Card>
+              <CardContent className="flex items-center justify-center p-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </CardContent>
+            </Card>
+          ) : vehiclesError ? (
+            <Card>
+              <CardContent className="flex items-center justify-center p-8">
+                <p className="text-destructive">Failed to load vehicle data</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <MapView vehicles={mapVehicles} />
+          )}
           <QuickActions />
         </div>
 
-        {/* Right Column - Notifications and Recent Activity */}
+        {/* Right Column - Recent Activity */}
         <div className="space-y-6">
-          <EmailNotificationCenter notifications={mockEmailNotifications} />
-          
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Recent Vehicle Activity</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {mockRecentVehicles.map((vehicle) => (
-                <div key={vehicle.id} className="text-sm">
-                  <VehicleCard {...vehicle} />
+              {vehiclesLoading ? (
+                <div className="flex items-center justify-center p-4">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                 </div>
-              ))}
+              ) : vehiclesError ? (
+                <p className="text-destructive text-center">Failed to load vehicles</p>
+              ) : recentVehicles.length > 0 ? (
+                recentVehicles.map((vehicle: any) => (
+                  <div key={vehicle.id} className="text-sm">
+                    <VehicleCard 
+                      id={vehicle.id}
+                      registrationNumber={vehicle.licensePlate}
+                      make={vehicle.make}
+                      model={vehicle.model}
+                      year={vehicle.year}
+                      status={vehicle.status}
+                      currentLocation="Location data not available"
+                      fuelLevel={0}
+                      driverName="Driver data not available"
+                      lastUpdate={new Date(vehicle.createdAt).toLocaleString()}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p className="text-muted-foreground text-center">No vehicles found</p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -226,11 +215,39 @@ export default function Dashboard() {
           <CardTitle>Active Trips</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockActiveTrips.map((trip) => (
-              <TripCard key={trip.id} {...trip} />
-            ))}
-          </div>
+          {tripsLoading ? (
+            <div className="flex items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          ) : tripsError ? (
+            <div className="flex items-center justify-center p-8">
+              <p className="text-destructive">Failed to load trips data</p>
+            </div>
+          ) : activeTrips.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeTrips.map((trip: any) => (
+                <TripCard 
+                  key={trip.id}
+                  id={trip.id}
+                  origin="Trip location data not available"
+                  destination="Trip location data not available"
+                  vehicle={{
+                    registrationNumber: "Unknown vehicle",
+                    driverName: "Unknown driver"
+                  }}
+                  status={trip.status}
+                  startDate={new Date(trip.startTime).toLocaleDateString()}
+                  expectedArrival={trip.endTime ? new Date(trip.endTime).toLocaleDateString() : "TBD"}
+                  progress={trip.status === "completed" ? 100 : 50}
+                  loadWeight={0}
+                  distance={trip.distance ? parseFloat(trip.distance) : 0}
+                  fuelBudget={0}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center">No active trips found</p>
+          )}
         </CardContent>
       </Card>
     </div>

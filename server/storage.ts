@@ -137,17 +137,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTrips(vehicleId?: string, driverId?: string): Promise<Trip[]> {
-    let query = db.select().from(trips);
-    
     if (vehicleId && driverId) {
-      query = query.where(and(eq(trips.vehicleId, vehicleId), eq(trips.driverId, driverId)));
+      return db.select().from(trips).where(and(eq(trips.vehicleId, vehicleId), eq(trips.driverId, driverId))).orderBy(desc(trips.createdAt));
     } else if (vehicleId) {
-      query = query.where(eq(trips.vehicleId, vehicleId));
+      return db.select().from(trips).where(eq(trips.vehicleId, vehicleId)).orderBy(desc(trips.createdAt));
     } else if (driverId) {
-      query = query.where(eq(trips.driverId, driverId));
+      return db.select().from(trips).where(eq(trips.driverId, driverId)).orderBy(desc(trips.createdAt));
     }
     
-    return query.orderBy(desc(trips.createdAt));
+    return db.select().from(trips).orderBy(desc(trips.createdAt));
   }
 
   async createTrip(trip: InsertTrip): Promise<Trip> {
@@ -162,7 +160,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTrip(id: string): Promise<boolean> {
     const result = await db.delete(trips).where(eq(trips.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Maintenance operations
@@ -172,13 +170,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMaintenanceRecords(vehicleId?: string): Promise<MaintenanceRecord[]> {
-    let query = db.select().from(maintenanceRecords);
-    
     if (vehicleId) {
-      query = query.where(eq(maintenanceRecords.vehicleId, vehicleId));
+      return db.select().from(maintenanceRecords).where(eq(maintenanceRecords.vehicleId, vehicleId)).orderBy(desc(maintenanceRecords.createdAt));
     }
     
-    return query.orderBy(desc(maintenanceRecords.createdAt));
+    return db.select().from(maintenanceRecords).orderBy(desc(maintenanceRecords.createdAt));
   }
 
   async createMaintenanceRecord(record: InsertMaintenanceRecord): Promise<MaintenanceRecord> {
@@ -193,7 +189,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMaintenanceRecord(id: string): Promise<boolean> {
     const result = await db.delete(maintenanceRecords).where(eq(maintenanceRecords.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   // Fleet statistics
