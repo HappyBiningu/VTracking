@@ -2,7 +2,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { MapPin, Truck, Clock, Package, Mail, Calendar } from "lucide-react";
+import { useLocation } from "wouter";
+import {
+  MapPin,
+  Clock,
+  Truck,
+  Package,
+  Mail,
+  Calendar
+} from "lucide-react";
 
 interface TripCardProps {
   id: string;
@@ -33,7 +41,7 @@ const statusColors = {
 const statusLabels = {
   planned: "Planned",
   "in-progress": "In Progress",
-  completed: "Completed", 
+  completed: "Completed",
   delayed: "Delayed"
 } as const;
 
@@ -52,6 +60,39 @@ export default function TripCard({
   onViewTrip,
   onSendUpdate
 }: TripCardProps) {
+  const [location, setLocation] = useLocation();
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "planned":
+        return "secondary";
+      case "in-progress":
+        return "default";
+      case "completed":
+        return "secondary";
+      case "delayed":
+        return "destructive";
+      default:
+        return "secondary";
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "planned":
+        return "Planned";
+      case "in-progress":
+        return "In Progress";
+      case "completed":
+        return "Completed";
+      case "delayed":
+        return "Delayed";
+      default:
+        return "Unknown";
+    }
+  };
+
+
   return (
     <Card className="hover-elevate" data-testid={`card-trip-${id}`}>
       <CardHeader className="pb-3">
@@ -61,7 +102,7 @@ export default function TripCard({
             {statusLabels[status]}
           </Badge>
         </div>
-        
+
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-green-600" />
@@ -75,7 +116,7 @@ export default function TripCard({
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         <div className="flex items-center gap-2 text-sm">
           <Truck className="w-4 h-4 text-muted-foreground" />
@@ -101,7 +142,7 @@ export default function TripCard({
               <div className="text-muted-foreground text-xs">{startDate}</div>
             </div>
           </div>
-          
+
           {expectedArrival && (
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
@@ -120,13 +161,13 @@ export default function TripCard({
               <span>{loadWeight}kg</span>
             </div>
           )}
-          
+
           {distance && (
             <div className="text-muted-foreground">
               {distance}km
             </div>
           )}
-          
+
           {fuelBudget && (
             <div className="text-muted-foreground">
               ${fuelBudget.toFixed(0)} fuel
@@ -135,20 +176,21 @@ export default function TripCard({
         </div>
 
         <div className="flex gap-2 pt-2">
-          <Button 
-            size="sm" 
-            variant="outline" 
+          <Button
+            size="sm"
+            variant="outline"
             className="flex-1"
             onClick={() => {
               console.log(`View trip details for ${id}`);
               onViewTrip?.();
+              setLocation(`/trips/${id}`);
             }}
             data-testid={`button-view-trip-${id}`}
           >
             View Trip
           </Button>
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant="ghost"
             onClick={() => {
               console.log(`Send email update for trip ${id}`);

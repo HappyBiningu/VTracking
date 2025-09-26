@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Truck, MapPin, Fuel, Clock, Mail } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface VehicleCardProps {
   id: string;
@@ -44,6 +45,8 @@ export default function VehicleCard({
   onViewDetails,
   onSendEmail
 }: VehicleCardProps) {
+  const [location, setLocation] = useLocation();
+
   return (
     <Card className="hover-elevate" data-testid={`card-vehicle-${id}`}>
       <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
@@ -64,7 +67,7 @@ export default function VehicleCard({
             {make} {model} ({year})
           </span>
         </div>
-        
+
         <div className="flex items-center gap-2 text-sm">
           <MapPin className="w-4 h-4 text-muted-foreground" />
           <span className="truncate" title={currentLocation}>

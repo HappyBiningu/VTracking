@@ -1,6 +1,6 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 import { 
   Plus, 
   Truck, 
@@ -13,8 +13,13 @@ import {
 } from "lucide-react";
 
 export default function QuickActions() {
-  const handleQuickAction = (action: string) => {
+  const [, setLocation] = useLocation();
+
+  const handleQuickAction = (action: string, path: string) => {
     console.log(`Quick action clicked: ${action}`);
+    if (path) {
+      setLocation(path);
+    }
   };
 
   const actions = [
@@ -24,7 +29,8 @@ export default function QuickActions() {
       description: "Register new vehicle",
       icon: Truck,
       color: "bg-blue-500 hover:bg-blue-600",
-      action: "Add Vehicle"
+      action: "Add Vehicle",
+      path: "/vehicles"
     },
     {
       id: "add-driver",
@@ -32,7 +38,8 @@ export default function QuickActions() {
       description: "Register new driver",
       icon: Users,
       color: "bg-green-500 hover:bg-green-600",
-      action: "Add Driver"
+      action: "Add Driver",
+      path: "/drivers"
     },
     {
       id: "plan-trip",
@@ -40,7 +47,8 @@ export default function QuickActions() {
       description: "Create new trip",
       icon: MapPin,
       color: "bg-purple-500 hover:bg-purple-600",
-      action: "Plan Trip"
+      action: "Plan Trip",
+      path: "/planning"
     },
     {
       id: "maintenance",
@@ -48,7 +56,8 @@ export default function QuickActions() {
       description: "Schedule service",
       icon: Wrench,
       color: "bg-orange-500 hover:bg-orange-600",
-      action: "Schedule Maintenance"
+      action: "Schedule Maintenance",
+      path: "/maintenance"
     },
     {
       id: "alerts",
@@ -56,7 +65,8 @@ export default function QuickActions() {
       description: "View active alerts",
       icon: AlertTriangle,
       color: "bg-red-500 hover:bg-red-600",
-      action: "System Alerts"
+      action: "System Alerts",
+      path: "/fleet"
     },
     {
       id: "reports",
@@ -64,7 +74,8 @@ export default function QuickActions() {
       description: "Generate reports",
       icon: BarChart3,
       color: "bg-indigo-500 hover:bg-indigo-600",
-      action: "Fleet Reports"
+      action: "Fleet Reports",
+      path: "/reports"
     }
   ];
 
@@ -85,7 +96,7 @@ export default function QuickActions() {
                 key={action.id}
                 variant="outline"
                 className="h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-shadow"
-                onClick={() => handleQuickAction(action.action)}
+                onClick={() => handleQuickAction(action.action, action.path)}
                 data-testid={`quick-action-${action.id}`}
               >
                 <div className={`p-2 rounded-lg text-white ${action.color}`}>
@@ -106,7 +117,7 @@ export default function QuickActions() {
             <FileText className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Recent Actions</span>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Vehicle TRK-001-ZW registered</span>

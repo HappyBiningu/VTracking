@@ -17,6 +17,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "wouter";
 
 const navigationItems = [
   {
@@ -80,6 +81,7 @@ const navigationItems = [
 
 export default function AppSidebar() {
   const { user } = useAuth();
+  const [location, setLocation] = useLocation();
 
   const handleLogout = () => {
     console.log('Logout triggered');
@@ -109,32 +111,32 @@ export default function AppSidebar() {
                 if (item.items) {
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <a href={item.url} className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                          {item.badge && (
-                            <Badge variant="secondary" className="ml-auto">
-                              {item.badge}
-                            </Badge>
-                          )}
-                        </a>
+                      <SidebarMenuButton 
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => item.url && setLocation(item.url)}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                        {item.badge && (
+                          <Badge variant="secondary" className="ml-auto">
+                            {item.badge}
+                          </Badge>
+                        )}
                       </SidebarMenuButton>
                       <SidebarMenu>
                         {item.items.map((subItem) => (
                           <SidebarMenuItem key={subItem.title}>
                             <SidebarMenuButton
-                              asChild
+                              className="flex items-center gap-2 pl-8 cursor-pointer"
+                              onClick={() => setLocation(subItem.url)}
                               data-testid={`nav-${subItem.title.toLowerCase().replace(/\\s+/g, '-')}`}
                             >
-                              <a href={subItem.url} className="flex items-center gap-2 pl-8">
-                                <span>{subItem.title}</span>
-                                {subItem.badge && (
-                                  <Badge variant="secondary" className="ml-auto">
-                                    {subItem.badge}
-                                  </Badge>
-                                )}
-                              </a>
+                              <span>{subItem.title}</span>
+                              {subItem.badge && (
+                                <Badge variant="secondary" className="ml-auto">
+                                  {subItem.badge}
+                                </Badge>
+                              )}
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                         ))}
@@ -145,18 +147,17 @@ export default function AppSidebar() {
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
-                        asChild
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => setLocation(item.url!)}
                         data-testid={`nav-${item.title.toLowerCase().replace(/\\s+/g, '-')}`}
                       >
-                        <a href={item.url} className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                          {item.badge && (
-                            <Badge variant="secondary" className="ml-auto">
-                              {item.badge}
-                            </Badge>
-                          )}
-                        </a>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                        {item.badge && (
+                          <Badge variant="secondary" className="ml-auto">
+                            {item.badge}
+                          </Badge>
+                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
