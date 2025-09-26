@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Navigation, Zap, RefreshCw, Maximize2 } from "lucide-react";
+import { MapPin, Navigation, Truck } from "lucide-react";
 
 interface Vehicle {
   id: string;
@@ -15,186 +14,121 @@ interface Vehicle {
 
 interface MapViewProps {
   vehicles: Vehicle[];
-  onVehicleClick?: (vehicle: Vehicle) => void;
-  onRefresh?: () => void;
-  onFullscreen?: () => void;
 }
 
 const statusColors = {
   active: "bg-green-500",
-  maintenance: "bg-orange-500", 
+  maintenance: "bg-orange-500",
   offline: "bg-red-500"
 } as const;
 
-export default function MapView({ 
-  vehicles, 
-  onVehicleClick,
-  onRefresh,
-  onFullscreen 
-}: MapViewProps) {
-  const handleVehicleClick = (vehicle: Vehicle) => {
-    console.log(`Vehicle clicked: ${vehicle.registrationNumber}`);
-    onVehicleClick?.(vehicle);
-  };
+const statusLabels = {
+  active: "Active",
+  maintenance: "Maintenance",
+  offline: "Offline"
+} as const;
 
-  const handleRefresh = () => {
-    console.log('Map refresh triggered');
-    onRefresh?.();
-  };
-
-  const handleFullscreen = () => {
-    console.log('Fullscreen map triggered');
-    onFullscreen?.();
-  };
-
+export default function MapView({ vehicles }: MapViewProps) {
   return (
-    <Card className="h-full" data-testid="map-view">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-base font-semibold">Fleet Map View</CardTitle>
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="text-xs">
-            {vehicles.length} vehicles
-          </Badge>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            data-testid="button-refresh-map"
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleFullscreen}
-            data-testid="button-fullscreen-map"
-          >
-            <Maximize2 className="h-4 w-4" />
-          </Button>
+    <Card data-testid="map-view">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-lg font-semibold">Fleet Location Overview</CardTitle>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <MapPin className="h-4 w-4" />
+          <span>{vehicles.length} vehicles tracked</span>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
-        {/* Simulated Map Container */}
-        <div className="relative h-96 bg-muted/30 border rounded-lg mx-4 mb-4 overflow-hidden">
-          {/* Map Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <svg width="100%" height="100%">
-              <defs>
-                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="1"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#grid)" />
-            </svg>
+      <CardContent>
+        {/* Mock Map Container */}
+        <div className="relative bg-muted/30 rounded-lg border-2 border-dashed border-muted-foreground/20 h-80 mb-4 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50 opacity-50" />
+
+          {/* Map Grid Lines */}
+          <div className="absolute inset-0 opacity-20">
+            {[...Array(8)].map((_, i) => (
+              <div key={`h-${i}`} className="absolute w-full border-t border-gray-300" style={{ top: `${i * 12.5}%` }} />
+            ))}
+            {[...Array(6)].map((_, i) => (
+              <div key={`v-${i}`} className="absolute h-full border-l border-gray-300" style={{ left: `${i * 16.67}%` }} />
+            ))}
+          </div>
+
+          {/* Mock Map Title */}
+          <div className="absolute top-4 left-4 bg-white/90 rounded-lg px-3 py-2 shadow-sm">
+            <div className="text-sm font-medium">Fleet Coverage Map</div>
+            <div className="text-xs text-muted-foreground">Real-time vehicle positions</div>
           </div>
 
           {/* Vehicle Markers */}
-          {vehicles.map((vehicle, index) => (
-            <div
-              key={vehicle.id}
-              className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform`}
-              style={{
-                left: `${20 + (index % 8) * 10}%`,
-                top: `${30 + Math.floor(index / 8) * 15}%`
-              }}
-              onClick={() => handleVehicleClick(vehicle)}
-              data-testid={`marker-${vehicle.id}`}
-            >
-              <div className="relative">
-                <div className={`w-6 h-6 rounded-full ${statusColors[vehicle.status]} border-2 border-white shadow-lg flex items-center justify-center`}>
-                  <Navigation 
-                    className="w-3 h-3 text-white"
-                    style={{ transform: `rotate(${vehicle.heading}deg)` }}
-                  />
-                </div>
-                <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-background border rounded px-2 py-1 text-xs font-medium shadow-md whitespace-nowrap">
-                  {vehicle.registrationNumber}
-                  <div className="text-muted-foreground">
-                    {vehicle.speed} km/h
+          {vehicles.map((vehicle, index) => {
+            const x = Math.min(Math.max(10 + (index * 15) % 70, 10), 85);
+            const y = Math.min(Math.max(15 + (index * 12) % 60, 15), 75);
+
+            return (
+              <div
+                key={vehicle.id}
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+                style={{ left: `${x}%`, top: `${y}%` }}
+                data-testid={`vehicle-marker-${vehicle.id}`}
+              >
+                {/* Vehicle Marker */}
+                <div className="relative">
+                  <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center ${statusColors[vehicle.status]} hover:scale-110 transition-transform`}>
+                    <Truck className="w-3 h-3 text-white" />
                   </div>
+
+                  {/* Direction Indicator */}
+                  {vehicle.speed > 0 && (
+                    <div
+                      className="absolute -top-2 -right-2 w-3 h-3 bg-blue-500 rounded-full opacity-75"
+                      style={{ transform: `rotate(${vehicle.heading}deg)` }}
+                    >
+                      <Navigation className="w-2 h-2 text-white ml-0.5" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Tooltip on Hover */}
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-3 min-w-48 opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
+                  <div className="text-sm font-medium">{vehicle.registrationNumber}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className={`w-2 h-2 rounded-full ${statusColors[vehicle.status]}`} />
+                    <span className="text-xs text-muted-foreground">{statusLabels[vehicle.status]}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Lat: {vehicle.lat.toFixed(4)}, Lng: {vehicle.lng.toFixed(4)}
+                  </div>
+                  {vehicle.speed > 0 && (
+                    <div className="text-xs text-muted-foreground">
+                      Speed: {vehicle.speed} km/h
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
-
-          {/* Map Controls */}
-          <div className="absolute top-4 right-4 flex flex-col gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="w-8 h-8 p-0"
-              data-testid="button-zoom-in"
-            >
-              +
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="w-8 h-8 p-0"
-              data-testid="button-zoom-out"
-            >
-              -
-            </Button>
-          </div>
-
-          {/* Legend */}
-          <div className="absolute bottom-4 left-4 bg-background border rounded-lg p-3 shadow-md">
-            <div className="text-xs font-medium mb-2">Vehicle Status</div>
-            <div className="space-y-1 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span>Active</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                <span>Maintenance</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span>Offline</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Center Map Info */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-muted-foreground">
-            <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Interactive Map View</p>
-            <p className="text-xs">Real-time vehicle tracking</p>
-          </div>
+            );
+          })}
         </div>
 
-        {/* Status Summary */}
-        <div className="px-4 pb-4">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span className="text-muted-foreground">Active:</span>
-                <span className="font-medium">
-                  {vehicles.filter(v => v.status === "active").length}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                <span className="text-muted-foreground">Maintenance:</span>
-                <span className="font-medium">
-                  {vehicles.filter(v => v.status === "maintenance").length}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                <span className="text-muted-foreground">Offline:</span>
-                <span className="font-medium">
-                  {vehicles.filter(v => v.status === "offline").length}
-                </span>
-              </div>
+        {/* Vehicle Status Legend */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-green-500" />
+              <span className="text-sm text-muted-foreground">Active</span>
             </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Zap className="w-3 h-3" />
-              <span className="text-xs">Live tracking</span>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-orange-500" />
+              <span className="text-sm text-muted-foreground">Maintenance</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500" />
+              <span className="text-sm text-muted-foreground">Offline</span>
             </div>
           </div>
+
+          <Badge variant="secondary" className="text-xs">
+            Last updated: Just now
+          </Badge>
         </div>
       </CardContent>
     </Card>
