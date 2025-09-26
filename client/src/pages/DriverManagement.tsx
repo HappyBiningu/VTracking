@@ -27,7 +27,8 @@ import {
   FileText,
   Clock,
   Star,
-  Truck
+  Truck,
+  Upload
 } from "lucide-react";
 import DocumentUpload from "@/components/DocumentUpload";
 
