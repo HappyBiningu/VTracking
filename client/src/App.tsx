@@ -10,6 +10,8 @@ import { useAuth } from "@/hooks/useAuth";
 import AppSidebar from "@/components/AppSidebar";
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
 import NotFound from "@/pages/not-found";
 
 function AuthenticatedRouter() {
@@ -26,6 +28,8 @@ function UnauthenticatedRouter() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={Signup} />
       <Route component={NotFound} />
     </Switch>
   );

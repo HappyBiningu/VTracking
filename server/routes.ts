@@ -9,31 +9,50 @@ import {
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Simple authentication - create a default user for demo purposes
+  // Simple in-memory authentication for demo purposes
   let authenticatedUser: any = null;
+  
+  // Mock user for demo
+  const mockUser = {
+    id: "demo-user-1",
+    username: "fleetmanager",
+    password: "demo123"
+  };
 
   // Login endpoint
   app.get("/api/login", async (req, res) => {
     try {
-      // For demo purposes, create or get a default fleet manager user
-      let user = await storage.getUserByUsername("fleetmanager");
-      
-      if (!user) {
-        // Create a default user for the demo
-        user = await storage.createUser({
-          username: "fleetmanager",
-          password: "demo123" // In production, this would be properly hashed
-        });
-      }
-      
-      // Set the authenticated user
-      authenticatedUser = user;
+      // For demo purposes, use the mock user
+      authenticatedUser = mockUser;
       
       // Redirect to dashboard
       res.redirect("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // Signup endpoint
+  app.post("/api/signup", async (req, res) => {
+    try {
+      const { username, email, password, companyName } = req.body;
+      
+      // For demo purposes, just return success
+      // In a real app, this would create a user in the database
+      res.json({ 
+        success: true, 
+        message: "Account created successfully",
+        user: {
+          id: "new-user-" + Date.now(),
+          username,
+          email,
+          companyName
+        }
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      res.status(500).json({ error: "Signup failed" });
     }
   });
 

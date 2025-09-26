@@ -6,7 +6,7 @@ import { Truck, MapPin, Fuel, Mail, BarChart3, Shield, Zap, Globe } from "lucide
 export default function Landing() {
   const handleLogin = () => {
     console.log('Login triggered');
-    window.location.href = '/api/login';
+    window.location.href = '/login';
   };
 
   const features = [
@@ -92,9 +92,10 @@ export default function Landing() {
                   size="lg" 
                   variant="outline"
                   className="text-lg px-8"
-                  data-testid="button-learn-more"
+                  onClick={() => window.location.href = '/signup'}
+                  data-testid="button-signup"
                 >
-                  Learn More
+                  Sign Up Free
                 </Button>
               </div>
 

@@ -60,7 +60,7 @@ export default function Dashboard() {
     avgFuelLevel: 0,
     lowFuelAlerts: 0,
     totalDistance: 0
-  };
+  } as const;
 
   // Transform vehicles for map display (only those with location data)
   const mapVehicles = vehicles
@@ -70,7 +70,9 @@ export default function Dashboard() {
       registrationNumber: vehicle.licensePlate,
       lat: parseFloat(vehicle.lastLatitude!),
       lng: parseFloat(vehicle.lastLongitude!),
-      status: vehicle.status,
+      status: (vehicle.status === "active" || vehicle.status === "maintenance" || vehicle.status === "offline") 
+        ? vehicle.status as "active" | "maintenance" | "offline"
+        : "offline" as const,
       heading: 0, // Default heading since we don't have this data
       speed: 0, // Default speed since we don't have this data
     }));
