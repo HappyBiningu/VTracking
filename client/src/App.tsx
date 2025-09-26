@@ -15,21 +15,19 @@ import NotFound from "@/pages/not-found";
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Dashboard} />
-        </>
-      )}
+      <Route path="/" component={isAuthenticated ? Dashboard : Landing} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-export default function App() {
+function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
 
   // Custom sidebar width for vehicle tracking application
@@ -38,28 +36,38 @@ export default function App() {
     "--sidebar-width-icon": "4rem",   // default icon width
   };
 
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return (
+      <SidebarProvider style={style as React.CSSProperties}>
+        <div className="flex h-screen w-full">
+          <AppSidebar />
+          <SidebarInset>
+            <header className="flex items-center justify-between p-4 border-b">
+              <SidebarTrigger data-testid="button-sidebar-toggle" />
+              <ThemeToggle />
+            </header>
+            <main className="flex-1 overflow-auto">
+              <Router />
+            </main>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  return <Router />;
+}
+
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="fleettrack-theme">
         <TooltipProvider>
-          {!isLoading && isAuthenticated ? (
-            <SidebarProvider style={style as React.CSSProperties}>
-              <div className="flex h-screen w-full">
-                <AppSidebar />
-                <SidebarInset>
-                  <header className="flex items-center justify-between p-4 border-b">
-                    <SidebarTrigger data-testid="button-sidebar-toggle" />
-                    <ThemeToggle />
-                  </header>
-                  <main className="flex-1 overflow-auto">
-                    <Router />
-                  </main>
-                </SidebarInset>
-              </div>
-            </SidebarProvider>
-          ) : (
-            <Router />
-          )}
+          <AppContent />
           <Toaster />
         </TooltipProvider>
       </ThemeProvider>
