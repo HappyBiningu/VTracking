@@ -5,33 +5,63 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Truck, Lock, User, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { queryClient } from "@/lib/queryClient";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // For demo purposes, accept any credentials
-      if (username && password) {
-        window.location.href = "/api/login";
-      } else {
+      if (!username || !password) {
         toast({
           title: "Error",
           description: "Please enter both username and password",
           variant: "destructive",
         });
+        return;
       }
+
+      // Call the backend login API
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      toast({
+        title: "Login Successful",
+        description: "Welcome to FleetTrack Pro!",
+      });
+
+      // Invalidate auth query to refresh user state
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      
+      // Redirect to dashboard
+      setLocation("/dashboard");
+      
     } catch (error) {
       toast({
         title: "Login Failed",
-        description: "Please check your credentials and try again",
+        description: error instanceof Error ? error.message : "Please check your credentials and try again",
         variant: "destructive",
       });
     } finally {

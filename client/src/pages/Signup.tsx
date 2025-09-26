@@ -49,14 +49,30 @@ export default function Signup() {
         return;
       }
 
-      // For demo purposes, show success and redirect to login
+      // Call the backend signup API
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          companyName: formData.companyName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Signup failed');
+      }
+
       toast({
         title: "Account Created Successfully!",
         description: "Please sign in with your new credentials",
       });
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Redirect to login
       window.location.href = "/login";
@@ -64,7 +80,7 @@ export default function Signup() {
     } catch (error) {
       toast({
         title: "Signup Failed",
-        description: "Please try again later",
+        description: error instanceof Error ? error.message : "Please try again later",
         variant: "destructive",
       });
     } finally {
