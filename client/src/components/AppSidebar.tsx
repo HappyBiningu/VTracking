@@ -2,22 +2,79 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Home, Truck, Route, Fuel, FileText, Settings, Users, Mail, BarChart3, LogOut } from "lucide-react";
+import {
+  Home,
+  Truck,
+  MapPin,
+  Bell,
+  BarChart3,
+  Mail,
+  Settings,
+  User,
+  Fuel,
+  FileText,
+  File,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-const menuItems = [
-  { title: "Dashboard", icon: Home, url: "/", badge: null },
-  { title: "Fleet Overview", icon: Truck, url: "/fleet", badge: "24" },
-  { title: "Active Trips", icon: Route, url: "/trips", badge: "12" },
-  { title: "Fuel Management", icon: Fuel, url: "/fuel", badge: "3" },
-  { title: "Reports", icon: BarChart3, url: "/reports", badge: null },
-  { title: "Documents", icon: FileText, url: "/documents", badge: null },
-  { title: "Email Center", icon: Mail, url: "/emails", badge: "7" },
-];
-
-const adminItems = [
-  { title: "User Management", icon: Users, url: "/admin/users", badge: null },
-  { title: "System Settings", icon: Settings, url: "/admin/settings", badge: null },
+const navigationItems = [
+  {
+    title: "Dashboard",
+    url: "/",
+    icon: Home,
+    badge: null,
+  },
+  {
+    title: "Fleet Management",
+    icon: Truck,
+    items: [
+      { title: "Fleet Overview", url: "/fleet", badge: "24" },
+      { title: "Vehicle Details", url: "/vehicles", badge: null },
+      { title: "Driver Management", url: "/drivers", badge: null },
+    ],
+  },
+  {
+    title: "Trip Management",
+    icon: MapPin,
+    items: [
+      { title: "Active Trips", url: "/trips", badge: "12" },
+      { title: "Trip Planning", url: "/planning", badge: null },
+      { title: "Route Optimization", url: "/routes", badge: null },
+    ],
+  },
+  {
+    title: "Fuel Management",
+    url: "/fuel",
+    icon: Fuel,
+    badge: "3",
+  },
+  {
+    title: "Reports",
+    url: "/reports",
+    icon: FileText,
+    badge: null,
+  },
+  {
+    title: "Documents",
+    url: "/documents",
+    icon: File,
+    badge: null,
+  },
+  {
+    title: "Email Center",
+    icon: Mail,
+    url: "/emails",
+    badge: "7",
+  },
+  {
+    title: "Settings",
+    icon: Settings,
+    items: [
+      { title: "System Settings", url: "/settings", badge: null },
+      { title: "User Management", url: "/users", badge: null },
+      { title: "Notifications", url: "/notifications", badge: null },
+    ],
+  },
 ];
 
 export default function AppSidebar() {
@@ -47,50 +104,63 @@ export default function AppSidebar() {
           <SidebarGroupLabel>Fleet Operations</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    data-testid={`nav-${item.title.toLowerCase().replace(/\\s+/g, '-')}`}
-                  >
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                      {item.badge && (
-                        <Badge variant="secondary" className="ml-auto">
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Administration</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {adminItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    data-testid={`nav-${item.title.toLowerCase().replace(/\\s+/g, '-')}`}
-                  >
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                      {item.badge && (
-                        <Badge variant="secondary" className="ml-auto">
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navigationItems.map((item) => {
+                if (item.items) {
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <a href={item.url} className="flex items-center gap-2">
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                          {item.badge && (
+                            <Badge variant="secondary" className="ml-auto">
+                              {item.badge}
+                            </Badge>
+                          )}
+                        </a>
+                      </SidebarMenuButton>
+                      <SidebarMenu>
+                        {item.items.map((subItem) => (
+                          <SidebarMenuItem key={subItem.title}>
+                            <SidebarMenuButton
+                              asChild
+                              data-testid={`nav-${subItem.title.toLowerCase().replace(/\\s+/g, '-')}`}
+                            >
+                              <a href={subItem.url} className="flex items-center gap-2 pl-8">
+                                <span>{subItem.title}</span>
+                                {subItem.badge && (
+                                  <Badge variant="secondary" className="ml-auto">
+                                    {subItem.badge}
+                                  </Badge>
+                                )}
+                              </a>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        ))}
+                      </SidebarMenu>
+                    </SidebarMenuItem>
+                  );
+                } else {
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        data-testid={`nav-${item.title.toLowerCase().replace(/\\s+/g, '-')}`}
+                      >
+                        <a href={item.url} className="flex items-center gap-2">
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                          {item.badge && (
+                            <Badge variant="secondary" className="ml-auto">
+                              {item.badge}
+                            </Badge>
+                          )}
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

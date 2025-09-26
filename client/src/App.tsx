@@ -10,6 +10,11 @@ import { useAuth } from "@/hooks/useAuth";
 import AppSidebar from "@/components/AppSidebar";
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
+import FleetOverview from "@/pages/FleetOverview";
+import ActiveTrips from "@/pages/ActiveTrips";
+import FuelManagement from "@/pages/FuelManagement";
+import Reports from "@/pages/Reports";
+import Documents from "@/pages/Documents";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import NotFound from "@/pages/not-found";
@@ -19,6 +24,11 @@ function AuthenticatedRouter() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/fleet" component={FleetOverview} />
+      <Route path="/trips" component={ActiveTrips} />
+      <Route path="/fuel" component={FuelManagement} />
+      <Route path="/reports" component={Reports} />
+      <Route path="/documents" component={Documents} />
       <Route component={NotFound} />
     </Switch>
   );
