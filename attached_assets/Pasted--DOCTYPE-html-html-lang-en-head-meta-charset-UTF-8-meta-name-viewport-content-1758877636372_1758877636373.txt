@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracking System - Database ERD</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .diagram-container {
+            position: relative;
+            height: 900px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            overflow: auto;
+        }
+        .entity {
+            position: absolute;
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            min-width: 200px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .entity-header {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 6px 6px 0 0;
+        }
+        .entity-body {
+            padding: 10px;
+        }
+        .attribute {
+            padding: 4px 8px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 12px;
+        }
+        .primary-key {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .foreign-key {
+            color: #f39c12;
+            font-style: italic;
+        }
+        .relationship-line {
+            position: absolute;
+            height: 2px;
+            background: #2c3e50;
+            z-index: 1;
+        }
+        .relationship-label {
+            position: absolute;
+            background: white;
+            padding: 2px 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+        .cardinality {
+            position: absolute;
+            font-weight: bold;
+            font-size: 12px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vehicle Tracking System - Database ERD</h1>
+        
+        <div class="diagram-container">
+            
+            <!-- Companies Entity -->
+            <div class="entity" style="left: 50px; top: 50px;">
+                <div class="entity-header">COMPANIES</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">company_id (PK)</div>
+                    <div class="attribute">company_name</div>
+                    <div class="attribute">contact_person</div>
+                    <div class="attribute">phone_number</div>
+                    <div class="attribute">email</div>
+                    <div class="attribute">address</div>
+                    <div class="attribute">registration_number</div>
+                    <div class="attribute">created_date</div>
+                </div>
+            </div>
+            
+            <!-- Vehicles Entity -->
+            <div class="entity" style="left: 350px; top: 50px;">
+                <div class="entity-header">VEHICLES</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">vehicle_id (PK)</div>
+                    <div class="attribute foreign-key">company_id (FK)</div>
+                    <div class="attribute">registration_number</div>
+                    <div class="attribute">make_model</div>
+                    <div class="attribute">year</div>
+                    <div class="attribute">fuel_capacity</div>
+                    <div class="attribute">load_capacity</div>
+                    <div class="attribute">gps_device_id</div>
+                    <div class="attribute">status</div>
+                    <div class="attribute">created_date</div>
+                </div>
+            </div>
+            
+            <!-- Drivers Entity -->
+            <div class="entity" style="left: 650px; top: 50px;">
+                <div class="entity-header">DRIVERS</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">driver_id (PK)</div>
+                    <div class="attribute foreign-key">company_id (FK)</div>
+                    <div class="attribute">first_name</div>
+                    <div class="attribute">last_name</div>
+                    <div class="attribute">license_number</div>
+                    <div class="attribute">phone_number</div>
+                    <div class="attribute">whatsapp_number</div>
+                    <div class="attribute">experience_years</div>
+                    <div class="attribute">status</div>
+                </div>
+            </div>
+            
+            <!-- Trips Entity -->
+            <div class="entity" style="left: 200px; top: 300px;">
+                <div class="entity-header">TRIPS</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">trip_id (PK)</div>
+                    <div class="attribute foreign-key">vehicle_id (FK)</div>
+                    <div class="attribute foreign-key">driver_id (FK)</div>
+                    <div class="attribute">origin</div>
+                    <div class="attribute">destination</div>
+                    <div class="attribute">start_datetime</div>
+                    <div class="attribute">end_datetime</div>
+                    <div class="attribute">distance_km</div>
+                    <div class="attribute">load_weight</div>
+                    <div class="attribute">trip_status</div>
+                    <div class="attribute">estimated_fuel</div>
+                    <div class="attribute">actual_fuel</div>
+                </div>
+            </div>
+            
+            <!-- GPS Logs Entity -->
+            <div class="entity" style="left: 500px; top: 300px;">
+                <div class="entity-header">GPS_LOGS</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">log_id (PK)</div>
+                    <div class="attribute foreign-key">vehicle_id (FK)</div>
+                    <div class="attribute foreign-key">trip_id (FK)</div>
+                    <div class="attribute">timestamp</div>
+                    <div class="attribute">latitude</div>
+                    <div class="attribute">longitude</div>
+                    <div class="attribute">speed</div>
+                    <div class="attribute">heading</div>
+                    <div class="attribute">altitude</div>
+                    <div class="attribute">signal_strength</div>
+                </div>
+            </div>
+            
+            <!-- Communications Entity -->
+            <div class="entity" style="left: 50px; top: 550px;">
+                <div class="entity-header">COMMUNICATIONS</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">comm_id (PK)</div>
+                    <div class="attribute foreign-key">trip_id (FK)</div>
+                    <div class="attribute foreign-key">driver_id (FK)</div>
+                    <div class="attribute">message_type</div>
+                    <div class="attribute">message_content</div>
+                    <div class="attribute">timestamp</div>
+                    <div class="attribute">sender_type</div>
+                    <div class="attribute">delivery_status</div>
+                    <div class="attribute">response_time</div>
+                </div>
+            </div>
+            
+            <!-- Fuel Records Entity -->
+            <div class="entity" style="left: 350px; top: 550px;">
+                <div class="entity-header">FUEL_RECORDS</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">fuel_id (PK)</div>
+                    <div class="attribute foreign-key">trip_id (FK)</div>
+                    <div class="attribute foreign-key">vehicle_id (FK)</div>
+                    <div class="attribute">fuel_station</div>
+                    <div class="attribute">liters_filled</div>
+                    <div class="attribute">cost_usd</div>
+                    <div class="attribute">odometer_reading</div>
+                    <div class="attribute">timestamp</div>
+                    <div class="attribute">receipt_image</div>
+                </div>
+            </div>
+            
+            <!-- Border Documents Entity -->
+            <div class="entity" style="left: 650px; top: 550px;">
+                <div class="entity-header">BORDER_DOCUMENTS</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">doc_id (PK)</div>
+                    <div class="attribute foreign-key">trip_id (FK)</div>
+                    <div class="attribute">border_post</div>
+                    <div class="attribute">document_type</div>
+                    <div class="attribute">document_number</div>
+                    <div class="attribute">uploaded_file</div>
+                    <div class="attribute">upload_timestamp</div>
+                    <div class="attribute">clearance_time</div>
+                    <div class="attribute">status</div>
+                </div>
+            </div>
+            
+            <!-- Loading Sites Entity -->
+            <div class="entity" style="left: 950px; top: 300px;">
+                <div class="entity-header">LOADING_SITES</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">site_id (PK)</div>
+                    <div class="attribute">site_name</div>
+                    <div class="attribute">location</div>
+                    <div class="attribute">contact_person</div>
+                    <div class="attribute">phone_number</div>
+                    <div class="attribute">coordinates</div>
+                    <div class="attribute">operating_hours</div>
+                    <div class="attribute">site_type</div>
+                </div>
+            </div>
+            
+            <!-- Maintenance Records Entity -->
+            <div class="entity" style="left: 950px; top: 50px;">
+                <div class="entity-header">MAINTENANCE</div>
+                <div class="entity-body">
+                    <div class="attribute primary-key">maintenance_id (PK)</div>
+                    <div class="attribute foreign-key">vehicle_id (FK)</div>
+                    <div class="attribute">maintenance_type</div>
+                    <div class="attribute">description</div>
+                    <div class="attribute">cost</div>
+                    <div class="attribute">service_date</div>
+                    <div class="attribute">next_service_km</div>
+                    <div class="attribute">service_provider</div>
+                </div>
+            </div>
+            
+            <!-- Relationship Lines -->
+            <div class="relationship-line" style="left: 250px; top: 161px; width: 100px;"></div>
+            <div class="cardinality" style="left: 260px; top: 145px;">1</div>
+            <div class="cardinality" style="left: 340px; top: 145px;">M</div>
+            
+            <div class="relationship-line" style="left: 550px; top: 161px; width: 100px;"></div>
+            <div class="cardinality" style="left: 560px; top: 145px;">1</div>
+            <div class="cardinality" style="left: 640px; top: 145px;">M</div>
+            
+            <div class="relationship-line" style="left: 450px; top: 250px; width: 0px; height: 50px; transform: rotate(90deg);"></div>
+            <div class="cardinality" style="left: 440px; top: 260px;">1</div>
+            <div class="cardinality" style="left: 440px; top: 290px;">M</div>
+            
+            <div class="relationship-line" style="left: 720px; top: 250px; width: 0px; height: 50px; transform: rotate(90deg);"></div>
+            <div class="cardinality" style="left: 710px; top: 260px;">1</div>
+            <div class="cardinality" style="left: 710px; top: 290px;">M</div>
+            
+            <div class="relationship-line" style="left: 400px; top: 411px; width: 100px;"></div>
+            <div class="cardinality" style="left: 410px; top: 395px;">1</div>
+            <div class="cardinality" style="left: 490px; top: 395px;">M</div>
+            
+        </div>
+    </div>
+</body>
+</html>

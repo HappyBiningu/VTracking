@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracking System - Architecture</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .architecture {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .layer {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border: 2px solid #dee2e6;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .layer:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        .layer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        .layer h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        .component {
+            background: white;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        .component:hover {
+            transform: translateX(5px);
+            border-left-color: #764ba2;
+        }
+        .hardware { border-left-color: #e74c3c; }
+        .software { border-left-color: #3498db; }
+        .data { border-left-color: #2ecc71; }
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            top: 50%;
+            z-index: -1;
+        }
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        .flow-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 40px 0;
+            padding: 20px;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+        }
+        .icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚛 Vehicle Tracking System Architecture</h1>
+        
+        <div class="architecture">
+            <div class="layer">
+                <h3>🔧 Hardware Layer</h3>
+                <div class="component hardware">
+                    <div class="icon">📡</div>
+                    <strong>GPS Module</strong><br>
+                    Real-time location tracking
+                </div>
+                <div class="component hardware">
+                    <div class="icon">📱</div>
+                    <strong>GSM Module</strong><br>
+                    Data transmission via cellular
+                </div>
+                <div class="component hardware">
+                    <div class="icon">🖥️</div>
+                    <strong>Android Radio OS</strong><br>
+                    In-vehicle interface
+                </div>
+                <div class="component hardware">
+                    <div class="icon">⚡</div>
+                    <strong>OBD-II Port</strong><br>
+                    Vehicle diagnostics
+                </div>
+            </div>
+
+            <div class="layer">
+                <h3>💻 Software Layer</h3>
+                <div class="component software">
+                    <div class="icon">🌐</div>
+                    <strong>Web Dashboard</strong><br>
+                    Admin monitoring interface
+                </div>
+                <div class="component software">
+                    <div class="icon">💬</div>
+                    <strong>WhatsApp API</strong><br>
+                    Driver communication
+                </div>
+                <div class="component software">
+                    <div class="icon">🔄</div>
+                    <strong>Data Processing Engine</strong><br>
+                    Analytics and insights
+                </div>
+                <div class="component software">
+                    <div class="icon">📊</div>
+                    <strong>Reporting System</strong><br>
+                    Trip and fuel reports
+                </div>
+            </div>
+
+            <div class="layer">
+                <h3>🗄️ Data Layer</h3>
+                <div class="component data">
+                    <div class="icon">🗃️</div>
+                    <strong>PostgreSQL Database</strong><br>
+                    Trip and vehicle records
+                </div>
+                <div class="component data">
+                    <div class="icon">☁️</div>
+                    <strong>Cloud Storage</strong><br>
+                    Document management
+                </div>
+                <div class="component data">
+                    <div class="icon">🔐</div>
+                    <strong>Backup System</strong><br>
+                    Data redundancy
+                </div>
+                <div class="component data">
+                    <div class="icon">📈</div>
+                    <strong>Analytics Store</strong><br>
+                    Historical data analysis
+                </div>
+            </div>
+        </div>
+
+        <div class="flow-container">
+            <div style="text-align: center;">
+                <div class="icon">🚛</div>
+                <strong>Vehicle</strong>
+            </div>
+            <div class="arrow">→</div>
+            <div style="text-align: center;">
+                <div class="icon">📡</div>
+                <strong>GPS/GSM</strong>
+            </div>
+            <div class="arrow">→</div>
+            <div style="text-align: center;">
+                <div class="icon">🌐</div>
+                <strong>Server</strong>
+            </div>
+            <div class="arrow">→</div>
+            <div style="text-align: center;">
+                <div class="icon">📊</div>
+                <strong>Dashboard</strong>
+            </div>
+            <div class="arrow">→</div>
+            <div style="text-align: center;">
+                <div class="icon">👨‍💼</div>
+                <strong>Manager</strong>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

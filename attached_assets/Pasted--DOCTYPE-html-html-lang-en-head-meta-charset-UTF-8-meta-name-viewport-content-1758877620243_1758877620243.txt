@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracking System - Use Case Diagram</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .diagram-container {
+            position: relative;
+            height: 800px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #fafafa;
+            overflow: hidden;
+        }
+        .actor {
+            position: absolute;
+            width: 100px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            border-radius: 10px;
+            border: 2px solid #2196f3;
+            font-weight: bold;
+            color: #1976d2;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .use-case {
+            position: absolute;
+            background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+            border: 2px solid #ff9800;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #f57c00;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 120px;
+        }
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: #666;
+            z-index: 1;
+        }
+        .system-boundary {
+            position: absolute;
+            border: 3px dashed #4caf50;
+            background: rgba(76, 175, 80, 0.05);
+            border-radius: 15px;
+        }
+        .label {
+            position: absolute;
+            font-weight: bold;
+            color: #4caf50;
+            font-size: 18px;
+        }
+        .stick-figure {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vehicle Tracking System - Use Case Diagram</h1>
+        
+        <div class="diagram-container">
+            <!-- System Boundary -->
+            <div class="system-boundary" style="left: 200px; top: 50px; width: 800px; height: 700px;"></div>
+            <div class="label" style="left: 550px; top: 30px;">Vehicle Tracking System</div>
+            
+            <!-- Actors -->
+            <div class="actor" style="left: 50px; top: 100px;">
+                <div class="stick-figure">👨‍💼</div>
+                <div>Logistics Manager</div>
+            </div>
+            
+            <div class="actor" style="left: 50px; top: 300px;">
+                <div class="stick-figure">🚛</div>
+                <div>Truck Driver</div>
+            </div>
+            
+            <div class="actor" style="left: 50px; top: 500px;">
+                <div class="stick-figure">⚙️</div>
+                <div>System Admin</div>
+            </div>
+            
+            <div class="actor" style="left: 1100px; top: 200px;">
+                <div class="stick-figure">🛃</div>
+                <div>Border Official</div>
+            </div>
+            
+            <!-- Use Cases for Logistics Manager -->
+            <div class="use-case" style="left: 250px; top: 80px;">View Real-time Location</div>
+            <div class="use-case" style="left: 400px; top: 120px;">Monitor Fuel Consumption</div>
+            <div class="use-case" style="left: 600px; top: 100px;">Generate Trip Reports</div>
+            <div class="use-case" style="left: 250px; top: 160px;">Receive Alerts</div>
+            <div class="use-case" style="left: 450px; top: 200px;">View Dashboard Analytics</div>
+            
+            <!-- Use Cases for Truck Driver -->
+            <div class="use-case" style="left: 250px; top: 280px;">Send Status Updates</div>
+            <div class="use-case" style="left: 450px; top: 320px;">Communicate via WhatsApp</div>
+            <div class="use-case" style="left: 650px; top: 300px;">Log Loading/Unloading</div>
+            <div class="use-case" style="left: 300px; top: 360px;">Update Fuel Records</div>
+            
+            <!-- Use Cases for System Admin -->
+            <div class="use-case" style="left: 250px; top: 480px;">Manage Vehicle Database</div>
+            <div class="use-case" style="left: 450px; top: 520px;">Configure System Settings</div>
+            <div class="use-case" style="left: 650px; top: 500px;">Backup Data</div>
+            <div class="use-case" style="left: 350px; top: 580px;">Manage User Accounts</div>
+            
+            <!-- Use Cases for Border Official -->
+            <div class="use-case" style="left: 800px; top: 180px;">Access Border Documents</div>
+            <div class="use-case" style="left: 800px; top: 240px;">Verify Vehicle Details</div>
+            
+            <!-- Cross-cutting Use Cases -->
+            <div class="use-case" style="left: 500px; top: 400px;">Store Historical Data</div>
+            <div class="use-case" style="left: 700px; top: 380px;">GPS Tracking</div>
+            <div class="use-case" style="left: 400px; top: 450px;">Data Analytics</div>
+            
+            <!-- Connection Lines (simplified representation) -->
+            <div class="connection" style="left: 150px; top: 140px; width: 100px; transform: rotate(0deg);"></div>
+            <div class="connection" style="left: 150px; top: 340px; width: 100px; transform: rotate(0deg);"></div>
+            <div class="connection" style="left: 150px; top: 540px; width: 100px; transform: rotate(0deg);"></div>
+            <div class="connection" style="left: 800px; top: 220px; width: 100px; transform: rotate(180deg);"></div>
+        </div>
+    </div>
+</body>
+</html>
