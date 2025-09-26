@@ -11,7 +11,11 @@ import AppSidebar from "@/components/AppSidebar";
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import FleetOverview from "@/pages/FleetOverview";
+import VehicleDetails from "@/pages/VehicleDetails";
+import DriverManagement from "@/pages/DriverManagement";
 import ActiveTrips from "@/pages/ActiveTrips";
+import TripPlanning from "@/pages/TripPlanning";
+import RouteOptimization from "@/pages/RouteOptimization";
 import FuelManagement from "@/pages/FuelManagement";
 import Reports from "@/pages/Reports";
 import Documents from "@/pages/Documents";
@@ -25,7 +29,11 @@ function AuthenticatedRouter() {
       <Route path="/" component={Dashboard} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/fleet" component={FleetOverview} />
+      <Route path="/vehicles" component={VehicleDetails} />
+      <Route path="/drivers" component={DriverManagement} />
       <Route path="/trips" component={ActiveTrips} />
+      <Route path="/planning" component={TripPlanning} />
+      <Route path="/routes" component={RouteOptimization} />
       <Route path="/fuel" component={FuelManagement} />
       <Route path="/reports" component={Reports} />
       <Route path="/documents" component={Documents} />
