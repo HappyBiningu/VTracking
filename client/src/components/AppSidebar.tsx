@@ -14,6 +14,7 @@ import {
   Fuel,
   FileText,
   File,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
